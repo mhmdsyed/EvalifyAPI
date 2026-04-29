@@ -48,7 +48,7 @@ public sealed class TemplatesController(ISender sender) : ApiController
         var result = await sender.Send(
             new CreateTemplateCommand(name, image.OpenReadStream(), image.FileName), ct);
 
-        return result.Match(Ok, Problem);
+        return result.Match(value => Created((string?)null, value), Problem);
     }
 
     [HttpGet("{templateId:int}/questions")]

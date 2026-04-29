@@ -11,6 +11,16 @@ builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddApi(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Logging
     .ClearProviders()
     .AddConsole()
@@ -49,6 +59,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
