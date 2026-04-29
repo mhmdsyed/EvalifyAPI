@@ -1,0 +1,151 @@
+# Evalify Test Flow - HTTP Test File
+# Base URL
+@baseUrl = https://localhost:7065/api/v1
+@token = {{login.response.body.$.token}}
+
+###############################################
+# 1. Login → get token
+###############################################
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "m6@ms.com",
+  "password": "m6@ms.com"
+}
+
+###############################################
+# 2. Create Template
+###############################################
+
+### Create Template
+POST {{baseUrl}}/templates
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="name"
+
+Final Exam - CS101
+------Boundary
+Content-Disposition: form-data; name="image"; filename="template.jpg"
+Content-Type: image/jpeg
+
+< ./template.jpg
+
+------Boundary--
+
+### Get All Templates
+GET {{baseUrl}}/templates
+Authorization: Bearer {{token}}
+###############################################
+# 3. Save Questions (at least 1 question with bounding box)
+###############################################
+
+
+### Save Questions — Full Replace
+POST {{baseUrl}}/templates/1/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questions": [
+    {
+      "questionIndex": 1,
+      "x": 50,
+      "y": 50,
+      "width": 300,
+      "height": 100,
+      "modelAnswer": "Paris",
+      "mark": 10.0
+    },
+    {
+      "questionIndex": 2,
+      "x": 50,
+      "y": 200,
+      "width": 300,
+      "height": 100,
+      "modelAnswer": "4",
+      "mark": 10.0
+    },
+    {
+      "questionIndex": 3,
+      "x": 50,
+      "y": 350,
+      "width": 300,
+      "height": 100,
+      "modelAnswer": "Blue",
+      "mark": 10.0
+    }
+  ]
+}
+
+### Get Questions
+GET {{baseUrl}}/templates/1/questions
+Authorization: Bearer {{token}}
+
+###############################################
+# 4. Upload Papers (multiple images in one request)
+###############################################
+
+### Upload Papers (Bulk)
+POST {{baseUrl}}/templates/1/papers
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="images"; filename="CS2101001.jpg"
+Content-Type: image/jpeg
+
+< D:\test-images\12.jpg
+------Boundary
+Content-Disposition: form-data; name="images"; filename="CS2101002.jpg"
+Content-Type: image/jpeg
+
+< D:\test-images\1.jpg
+------Boundary--
+
+###############################################
+# 5. Wait 10 seconds
+###############################################
+# Note: Manually wait 10 seconds before running the next request
+
+###############################################
+# 6. GET /api/templates/1/papers → status should change from Pending to Done
+###############################################
+
+### Get Papers for Template
+GET {{baseUrl}}/templates/1/papers
+Authorization: Bearer {{token}}
+
+###############################################
+# 7. GET /api/papers/1/results → should return grades per question
+###############################################
+
+### Get Results for Paper
+GET {{baseUrl}}/papers/1/results
+Authorization: Bearer {{token}}
+
+###############################################
+# 8. PUT /api/answers/1/grade → adjust a grade manually
+###############################################
+
+### Adjust Grade
+PUT {{baseUrl}}/answers/1/grade
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grade": 10.0
+}
+
+###############################################
+# 9. GET /api/templates/1/export → download CSV results
+###############################################
+
+### Export Template Results (CSV)
+GET {{baseUrl}}/templates/1/export
+Authorization: Bearer {{token}}

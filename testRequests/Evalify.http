@@ -1,0 +1,200 @@
+# Evalify API - HTTP Test File
+# Base URL
+@baseUrl = https://localhost:7065
+@token = {{login.response.body.$.token}}
+
+###############################################
+# 1. AUTH
+###############################################
+
+### Register
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "AhmedMohamed",
+  "email": "S6@pm.com",
+  "password": "S6@pm.com"
+}
+
+### Login — run this first (token auto-populates from response)
+# @name login
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "S6@pm.com",
+  "password": "S6@pm.com"
+}
+
+###############################################
+# 2. TEMPLATES
+###############################################
+
+### Get All Templates
+GET {{baseUrl}}/api/v1/templates
+Authorization: Bearer {{token}}
+
+### Create Template
+# Change the file path to a real jpg/png on your machine
+POST {{baseUrl}}/api/v1/templates
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="name"
+
+Final Exam - CS101
+------Boundary
+Content-Disposition: form-data; name="image"; filename="template.jpg"
+Content-Type: image/jpeg
+
+< assets\template.jpg
+------Boundary--
+
+###############################################
+# 3. QUESTIONS (Bounding Boxes)
+###############################################
+
+### Save Questions — Full Replace
+POST {{baseUrl}}/api/v1/templates/13/questions  
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questions": [
+    {
+      "questionIndex": 1,
+      "x": 120,
+      "y": 200,
+      "width": 800,
+      "height": 150,
+      "modelAnswer": "The water cycle consists of evaporation, condensation, and precipitation.",
+      "mark": 10.0
+    },
+    {
+      "questionIndex": 2,
+      "x": 120,
+      "y": 380,
+      "width": 800,
+      "height": 150,
+      "modelAnswer": "Photosynthesis is the process by which plants convert sunlight into food.",
+      "mark": 15.0
+    }
+  ]
+}
+
+### Get Questions
+GET {{baseUrl}}/api/v1/templates/10/questions
+Authorization: Bearer {{token}}
+
+###############################################
+# 4. PAPERS
+###############################################
+
+### Upload Paper
+# filename must be the student code e.g. CS2101001.jpg
+POST {{baseUrl}}/api/v1/templates/13/papers
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="image"; filename="CS2101009.jpg"
+Content-Type: image/jpeg
+
+< assets\CS2101001.jpg
+------Boundary--
+
+### Get All Papers
+GET {{baseUrl}}/api/v1/templates/13/papers
+Authorization: Bearer {{token}}
+
+###############################################
+# 5. RESULTS
+###############################################
+
+### Get Results for a Paper
+GET {{baseUrl}}/api/v1/papers/15/results
+Authorization: Bearer {{token}}
+
+### Adjust Grade
+PUT {{baseUrl}}/api/v1/answers/1/grade
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grade": 9.0
+}
+
+###############################################
+# VALIDATION TESTS
+###############################################
+
+### Register — missing fields (expect 400)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "",
+  "email": "notanemail",
+  "password": "123"
+}
+
+### Create Template — no name (expect 400)
+POST {{baseUrl}}/api/v1/templates
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="name"
+
+------Boundary
+Content-Disposition: form-data; name="image"; filename="template.jpg"
+Content-Type: image/jpeg
+
+< assets\template.jpg
+------Boundary--
+
+### Save Questions — duplicate index (expect 400)
+POST {{baseUrl}}/api/v1/templates/1/questions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "questions": [
+    {
+      "questionIndex": 1,
+      "x": 120,
+      "y": 200,
+      "width": 800,
+      "height": 150,
+      "modelAnswer": "Answer 1",
+      "mark": 10.0
+    },
+    {
+      "questionIndex": 1,
+      "x": 120,
+      "y": 380,
+      "width": 800,
+      "height": 150,
+      "modelAnswer": "Answer 2",
+      "mark": 15.0
+    }
+  ]
+}
+
+### Get Template not owned (expect 403)
+GET {{baseUrl}}/api/v1/templates/1/questions
+Authorization: Bearer {{token}}
+
+### Adjust Grade — exceeds max mark (expect 400)
+PUT {{baseUrl}}/api/v1/answers/1/grade
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grade": 999.0
+}
+
+### No Token (expect 401)
+GET {{baseUrl}}/api/v1/templates

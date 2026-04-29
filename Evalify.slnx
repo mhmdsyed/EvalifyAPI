@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Evalify.API/Evalify.API.csproj" />
+  <Project Path="Evalify.Application/Evalify.Application.csproj" />
+  <Project Path="Evalify.Domain/Evalify.Domain.csproj" />
+  <Project Path="Evalify.Infrastructure/Evalify.Infrastructure.csproj" />
+</Solution>
