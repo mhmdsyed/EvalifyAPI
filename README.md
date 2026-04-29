@@ -500,6 +500,9 @@ The backend allows requests from any origin during development (`AllowAll` polic
 5. Run migration:
 
 ```bash
+dotnet tool install --global dotnet-ef
+
+
 dotnet ef database update --project Evalify.Infrastructure --startup-project Evalify.API
 ```
 
