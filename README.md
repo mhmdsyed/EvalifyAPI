@@ -12,7 +12,9 @@ Evalify is an AI-powered platform that allows teachers to automatically evaluate
 ```
 https://localhost:7065/api/v1
 ```
-
+```
+http://localhost:5140/api/v1
+```
 > Change this to the actual server URL when deployed.
 
 ## API Explorer
@@ -517,6 +519,30 @@ dotnet run --project Evalify.API
 9. Swagger: `https://localhost:7065/swagger`
 
 ---
+Testing the Upload Endpoint
+Swagger and Scalar have issues with file uploads. Use Postman or a .http file instead.
+Postman:
+```
+Method: POST
+URL: http://localhost:5140/api/v1/templates/{templateId}/papers
+Headers: Authorization: Bearer {token}
+Body: form-data
+
+Key: images → Type: File → Value: select your jpg files
+```
+
+
+VS Code .http file:
+httpPOST http://localhost:5140/api/v1/templates/1/papers
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="images"; filename="CS2101001.jpg"
+Content-Type: image/jpeg
+
+< C:\path\to\CS2101001.jpg
+------Boundary--
 
 ## Quick Reference
 
