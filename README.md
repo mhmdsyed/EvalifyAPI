@@ -514,7 +514,7 @@ dotnet ef database update --project Evalify.Infrastructure --startup-project Eva
 dotnet run --project Evalify.API
 ```
 
-7. API runs on: `https://localhost:7065`
+7. API runs on: `https://localhost:7065` & `http://localhost:5140`
 8. Scalar UI: `https://localhost:7065/scalar/v1`
 9. Swagger: `https://localhost:7065/swagger`
 
@@ -531,9 +531,9 @@ Body: form-data
 Key: images → Type: File → Value: select your jpg files
 ```
 
-
+```
 VS Code .http file:
-httpPOST http://localhost:5140/api/v1/templates/1/papers
+httpPOST http://localhost:5140/api/v1/templates/{{templateId}}/papers
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=----Boundary
 
@@ -543,6 +543,7 @@ Content-Type: image/jpeg
 
 < C:\path\to\CS2101001.jpg
 ------Boundary--
+```
 
 ## Quick Reference
 
